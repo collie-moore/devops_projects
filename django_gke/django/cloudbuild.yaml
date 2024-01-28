@@ -13,7 +13,7 @@ steps:
     args:
       - '-c'
       - |
-        echo "FROM $_IMAGE_NAME
+        echo "FROM us-central1-docker.pkg.dev/cronjobs-409106/polls/polls:$COMMIT_SHA
         COPY --from=gcr.io/cloud-sql-connectors/cloud-sql-proxy /cloud-sql-proxy /cloudsql/cloud-sql-proxy" > Dockerfile-proxy;
         docker build -f Dockerfile-proxy -t us-central1-docker.pkg.dev/$PROJECT_ID/polls/polls-proxy:$COMMIT_SHA .
 
