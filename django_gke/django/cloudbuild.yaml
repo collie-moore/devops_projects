@@ -25,9 +25,7 @@ steps:
       - "MYSQL_PORT=3306"
       - "MYSQL_TYPE=mysql"
     secretEnv:
-      - MYSQL_PASSWORD
-      - MYSQL_DATABASE
-      - MYSQL_USER
+      - backend-secrets
     entrypoint: /bin/bash
     args:
       - '-c'
@@ -55,9 +53,5 @@ substitutions:
 
 availableSecrets:
   secretManager:
-    - versionName: projects/cronjobs-409106/secrets/MYSQL_PASSWORD/versions/1
-      env: 'MYSQL_PASSWORD'
-    - versionName: projects/cronjobs-409106/secrets/MYSQL_DATABASE/versions/1
-      env: 'MYSQL_DATABASE'
-    - versionName: projects/cronjobs-409106/secrets/MYSQL_USER/versions/1
-      env: 'MYSQL_USER'
+    - versionName: projects/cronjobs-409106/secrets/backend-secrets/versions/1
+      env: 'backend-secrets'
