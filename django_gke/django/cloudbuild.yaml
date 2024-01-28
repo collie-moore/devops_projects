@@ -1,7 +1,7 @@
 steps:
   - id: "Docker Build"
     name: 'gcr.io/cloud-builders/docker'
-    args: [ 'build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/polls/polls:$COMMIT_SHA', '.' ]
+    args: [ 'build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/polls/polls:$COMMIT_SHA', '/workspace/django_gke/django' ]
 
   - id: "Docker Push"
     name: 'gcr.io/cloud-builders/docker'
