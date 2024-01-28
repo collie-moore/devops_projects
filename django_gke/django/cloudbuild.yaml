@@ -13,7 +13,7 @@ steps:
     args:
       - '-c'
       - |
-        echo "FROM $_IMAGE_NAME
+        echo "FROM $_IMAGE_NAME:$COMMIT_SHA"
         COPY --from=gcr.io/cloud-sql-connectors/cloud-sql-proxy /cloud-sql-proxy /cloudsql/cloud-sql-proxy" > Dockerfile-proxy;
         docker build -f Dockerfile-proxy -t ${_IMAGE_NAME}-proxy .
 
