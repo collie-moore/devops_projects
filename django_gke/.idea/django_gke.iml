@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="PYTHON_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/django/.vscode" />
+      <excludeFolder url="file://$MODULE_DIR$/django/venv" />
+      <excludeFolder url="file://$MODULE_DIR$/django/venv/lib/python3.11/site-packages/django/contrib/admin/static" />
+      <excludeFolder url="file://$MODULE_DIR$/django/venv/lib/python3.11/site-packages/django/contrib/gis/static" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+  <component name="PyDocumentationSettings">
+    <option name="format" value="PLAIN" />
+    <option name="myDocStringFormat" value="Plain" />
+  </component>
+</module>

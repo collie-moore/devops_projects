@@ -1,0 +1,6 @@
+Django
+mysqlclient
+wheel
+gunicorn
+django-environ
+django-storages[google]

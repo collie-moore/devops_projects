@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: polls
+  namespace: polls
+  labels:
+    app: polls
+spec:
+  selector:
+    matchLabels:
+      app: polls
+  template:
+    metadata:
+      labels:
+        app: polls
+    spec:
+      containers:
+      - name: polls
+        image: gcr.io/google-containers/busybox
+        envFrom:
+          - secretRef:
+              name: polls
+        ports:
+        - containerPort: 8000
+      - name: cloudsql-proxy
+        image: gcr.io/cloudsql-docker/gce-proxy:1.17
+        command: ["/cloud_sql_proxy", "--dir=/cloudsql",
+                  "-instances=cronjobs-409106:us-central1:prod-mysql=tcp:3306",
+                  "-credential_file=/secrets/cloudsql/credentials.json"]
+        volumeMounts:
+          - name: polls
+            mountPath: /secrets/cloudsql
+            readOnly: true
+          - name: cloudsql
+            mountPath: /cloudsql
+      volumes:
+        - name: polls
+          secret:
+            secretName: polls-sa
+        - name: cloudsql
+          emptyDir: {}
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: polls
+spec:
+  type: ClusterIP
+  selector:
+    app: polls
+  ports:
+  - port: 8000
+    targetPort: 8000
+
+---
+
+
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: polls
+  namespace: polls
+spec:
+  domains:
+    - polls.amdava.org
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: polls
+  namespace: polls
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: polls
+    networking.gke.io/managed-certificates: polls
+    ingressClassName: "gce"
+spec:
+  defaultBackend:
+    service:
+      name: polls
+      port:
+        number: 8000
