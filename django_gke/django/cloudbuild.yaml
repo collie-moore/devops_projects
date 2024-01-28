@@ -33,6 +33,7 @@ steps:
       - '-c'
       - |
         /cloudsql/cloud-sql-proxy --port ${_MYSQL_PORT} ${_INSTANCE_CONNECTION_NAME} & sleep 2;
+        cd /workspace/django_gke/django;
         ./manage.py migrate
 
   - id: 'deploy to kubernetes'
