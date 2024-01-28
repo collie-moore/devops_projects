@@ -40,7 +40,7 @@ metadata:
   name: polls
   namespace: polls
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
     app: polls
   ports:
