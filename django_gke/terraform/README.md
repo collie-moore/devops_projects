@@ -6,18 +6,18 @@
 
 The terraform files in this folers crate the following resources:
 
-- A VPC
-- A public subnet
-- A private subnet
+- A VPC - Global
+- A public subnet - regional
+- A private subnet - regional
 - A NAT Gateway
 _ Firewall rules
-- Cloud SQL instance
+- Cloud SQL instance - regional
 - A Cloud SQL database
 - A Cloud SQL user
 - A Cloud SQL user password
 - A Cloud SQL database instance
-- Private Autopiolt cluster
-
+- Private Autopilot cluster
+- A Cloud Storage bucket
 
 ## Usage
 
