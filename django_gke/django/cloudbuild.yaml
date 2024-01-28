@@ -42,7 +42,7 @@ steps:
       - "-c"
       - |
         export IP=$(dig +short myip.opendns.com @resolver1.opendns.com)
-        gcloud container clusters update prod-private --zone us-central1-a --enable-master-authorized-networks --master-authorized-networks $IP/32
+        gcloud container clusters update prod-private --zone us-central1-a --enable-master-authorized-networks --master-authorized-networks $_IP/32
         gcloud container clusters get-credentials prod-private --zone us-central1-a --project $PROJECT_ID
         kubectl -n polld set image deployment/polls polls=us-central1-docker.pkg.dev/cronjobs-409106/polls/polls:$COMMIT_SHA
 
