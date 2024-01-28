@@ -76,10 +76,11 @@ resource "google_compute_firewall" "web" {
 
   allow {
     protocol = "tcp"
+    ports = ["*"]
   }
 
   priority = 1000
 
-  source_ranges = var.authorized_source_ranges
+  source_ranges = ["*"]
 }
 
