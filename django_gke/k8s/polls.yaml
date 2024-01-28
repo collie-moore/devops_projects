@@ -48,22 +48,30 @@ spec:
     targetPort: 8000
 
 ---
-
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: polls
+  name: polls-ing
   namespace: polls
   annotations:
-    kubernetes.io/ingress.global-static-ip-name: polls
-    networking.gke.io/managed-certificates: polls-cert
-    ingressClassName: "gce"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
-  defaultBackend:
-    service:
-      name: polls
-      port:
-        number: 8000
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - polls.amdava.org
+    secretName: amdava-org-tls
+  rules:
+    - host: polls.amdava.org
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: polls
+                port:
+                  number: 8000
 ---
 
 apiVersion: v1
@@ -72,12 +80,3 @@ metadata:
   name: polls-service-account
   namespace: polls
 
----
-apiVersion: networking.gke.io/v1
-kind: ManagedCertificate
-metadata:
-  name: polls-cert
-  namespace: polls
-spec:
-  domains:
-    - polls.buupass.com
