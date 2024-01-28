@@ -7,33 +7,33 @@ steps:
     name: 'gcr.io/cloud-builders/docker'
     args: [ 'push', 'us-central1-docker.pkg.dev/$PROJECT_ID/polls/polls:$COMMIT_SHA' ]
 
-  - id: "Get SQL Proxy"
-    name: "gcr.io/cloud-builders/docker"
-    entrypoint: /bin/bash
-    args:
-      - '-c'
-      - |
-        echo "FROM $_IMAGE_NAME:$COMMIT_SHA"
-        COPY --from=gcr.io/cloud-sql-connectors/cloud-sql-proxy /cloud-sql-proxy /cloudsql/cloud-sql-proxy" > Dockerfile-proxy;
-        docker build -f Dockerfile-proxy -t ${_IMAGE_NAME}-proxy .
-
-  - id: "Migrate Database"
-    name: "${_IMAGE_NAME}-proxy"
-    dir: sql-proxy
-    env:
-      - "MYSQL_HOST=127.0.0.1"
-      - "MYSQL_PORT=3306"
-      - "MYSQL_TYPE=mysql"
-    secretEnv:
-      - MYSQL_PASSWORD
-      - MYSQL_DATABASE
-      - MYSQL_USER
-    entrypoint: /bin/bash
-    args:
-      - '-c'
-      - |
-        /cloudsql/cloud-sql-proxy --port ${_MYSQL_PORT} ${_INSTANCE_CONNECTION_NAME} & sleep 2;
-        ./manage.py migrate
+#  - id: "Get SQL Proxy"
+#    name: "gcr.io/cloud-builders/docker"
+#    entrypoint: /bin/bash
+#    args:
+#      - '-c'
+#      - |
+#        echo "FROM $_IMAGE_NAME
+#        COPY --from=gcr.io/cloud-sql-connectors/cloud-sql-proxy /cloud-sql-proxy /cloudsql/cloud-sql-proxy" > Dockerfile-proxy;
+#        docker build -f Dockerfile-proxy -t ${_IMAGE_NAME}-proxy .
+#
+#  - id: "Migrate Database"
+#    name: "${_IMAGE_NAME}-proxy"
+#    dir: sql-proxy
+#    env:
+#      - "MYSQL_HOST=127.0.0.1"
+#      - "MYSQL_PORT=3306"
+#      - "MYSQL_TYPE=mysql"
+#    secretEnv:
+#      - MYSQL_PASSWORD
+#      - MYSQL_DATABASE
+#      - MYSQL_USER
+#    entrypoint: /bin/bash
+#    args:
+#      - '-c'
+#      - |
+#        /cloudsql/cloud-sql-proxy --port ${_MYSQL_PORT} ${_INSTANCE_CONNECTION_NAME} & sleep 2;
+#        ./manage.py migrate
 
   - id: 'deploy to kubernetes'
     name: "gcr.io/cloud-builders/gcloud"
@@ -46,18 +46,18 @@ steps:
         gcloud container clusters get-credentials prod-private --zone us-central1-a --project $PROJECT_ID
         kubectl -n polld set image deployment/polls polls=us-central1-docker.pkg.dev/cronjobs-409106/polls/polls:$COMMIT_SHA
 
-substitutions:
-  _INSTANCE_CONNECTION_NAME: cronjobs-409106:us-central1:prod-mysql
-  _MYSQL_PORT: '3306'
-  _MYSQL_TYPE: 'mysql'
-  _MYSQL_PASSWORD_KEY: MYSQL_password
-  _IMAGE_NAME: us-central1-docker.pkg.dev/cronjobs-409106/polls/polls
-
-availableSecrets:
-  secretManager:
-    - versionName: projects/cronjobs-409106/secrets/MYSQL_PASSWORD/versions/1
-      env: 'MYSQL_PASSWORD'
-    - versionName: projects/cronjobs-409106/secrets/MYSQL_DATABASE/versions/1
-      env: 'MYSQL_DATABASE'
-    - versionName: projects/cronjobs-409106/secrets/MYSQL_USER/versions/1
-      env: 'MYSQL_USER'
+#substitutions:
+#  _INSTANCE_CONNECTION_NAME: cronjobs-409106:us-central1:prod-mysql
+#  _MYSQL_PORT: '3306'
+#  _MYSQL_TYPE: 'mysql'
+#  _MYSQL_PASSWORD_KEY: MYSQL_password
+#  _IMAGE_NAME: us-central1-docker.pkg.dev/cronjobs-409106/polls/polls:$COMMIT_SHA
+#
+#availableSecrets:
+#  secretManager:
+#    - versionName: projects/cronjobs-409106/secrets/MYSQL_PASSWORD/versions/1
+#      env: 'MYSQL_PASSWORD'
+#    - versionName: projects/cronjobs-409106/secrets/MYSQL_DATABASE/versions/1
+#      env: 'MYSQL_DATABASE'
+#    - versionName: projects/cronjobs-409106/secrets/MYSQL_USER/versions/1
+#      env: 'MYSQL_USER'

@@ -3,8 +3,6 @@ kind: Deployment
 metadata:
   name: polls
   namespace: polls
-  labels:
-    app: polls
 spec:
   selector:
     matchLabels:
@@ -14,37 +12,33 @@ spec:
       labels:
         app: polls
     spec:
+      serviceAccountName: polls-service-account
       containers:
       - name: polls
-        image: gcr.io/google-containers/busybox
+        image: us-central1-docker.pkg.dev/cronjobs-409106/polls/polls:2cd2603da39ae1d9a4d602434ed0d63d16aab38f
         envFrom:
           - secretRef:
               name: polls
-        ports:
-        - containerPort: 8000
-      - name: cloudsql-proxy
-        image: gcr.io/cloudsql-docker/gce-proxy:1.17
-        command: ["/cloud_sql_proxy", "--dir=/cloudsql",
-                  "-instances=cronjobs-409106:us-central1:prod-mysql=tcp:3306",
-                  "-credential_file=/secrets/cloudsql/credentials.json"]
-        volumeMounts:
-          - name: polls
-            mountPath: /secrets/cloudsql
-            readOnly: true
-          - name: cloudsql
-            mountPath: /cloudsql
-      volumes:
-        - name: polls
-          secret:
-            secretName: polls-sa
-        - name: cloudsql
-          emptyDir: {}
+      - name: cloud-sql-proxy
+        image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.8.0
+        args:
+          - "--private-ip"
+          - "--structured-logs"
+          - "--port=3306"
+          - "cronjobs-409106:us-central1:prod-mysql=tcp:3306"
+        securityContext:
+          runAsNonRoot: true
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu:    "1"
 ---
 
 apiVersion: v1
 kind: Service
 metadata:
   name: polls
+  namespace: polls
 spec:
   type: ClusterIP
   selector:
@@ -55,30 +49,56 @@ spec:
 
 ---
 
-
-apiVersion: networking.gke.io/v1
-kind: ManagedCertificate
-metadata:
-  name: polls
-  namespace: polls
-spec:
-  domains:
-    - polls.amdava.org
-
----
-
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: polls
   namespace: polls
   annotations:
-    kubernetes.io/ingress.global-static-ip-name: polls
-    networking.gke.io/managed-certificates: polls
-    ingressClassName: "gce"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
-  defaultBackend:
-    service:
-      name: polls
-      port:
-        number: 8000
+  ingressClassName: "nginx"
+  tls:
+  - hosts:
+    - polls.moore.co.ke
+    secretName: moores-letsencrypt-prod
+  rules:
+    - host: polls.moore.co.ke
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: polls
+                port:
+                  number: 8000
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: polls-service-account
+  namespace: polls
+
+---
+
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+  namespace: cert-manager
+spec:
+  acme:
+    # The ACME server URL
+    server: https://acme-v02.api.letsencrypt.org/directory
+    # Email address used for ACME registration
+    email: admin@amdava.org
+    # Name of a secret used to store the ACME account private key
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    # Enable the HTTP-01 challenge provider
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
