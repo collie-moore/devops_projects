@@ -52,3 +52,13 @@ substitutions:
   _MYSQL_TYPE: 'mysql'
   _MYSQL_PASSWORD_KEY: MYSQL_password
   _IMAGE_NAME: us-central1-docker.pkg.dev/cronjobs-409106/polls/polls
+
+availableSecrets:
+  secretManager:
+    - versionName: projects/cronjobs-409106/secrets/MYSQL_password/versions/1
+      env: 'MYSQL_PASSWORD'
+    - versionName: projects/cronjobs-409106/secrets/MYSQL_database/versions/1
+      env: 'MYSQL_DATABASE'
+    - versionName: projects/cronjobs-409106/secrets/MYSQL_user/versions/1
+      env: 'MYSQL_USER'
+  
