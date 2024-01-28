@@ -51,4 +51,4 @@ substitutions:
   _MYSQL_PORT: '3306'
   _MYSQL_TYPE: 'mysql'
   _MYSQL_PASSWORD_KEY: MYSQL_password
-  _IMAGE_NAME: us-central1-docker.pkg.dev/cronjobs-409106/polls/polls:$COMMIT_SHA
+  _IMAGE_NAME: us-central1-docker.pkg.dev/cronjobs-409106/polls/polls
